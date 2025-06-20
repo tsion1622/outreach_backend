@@ -1,15 +1,20 @@
 FROM python:3.10
 
+# Set working directory to the actual project folder
 WORKDIR /app/outreach_backend
 
-COPY outreach_backend/requirements.txt ./
+# Copy only requirements.txt first
+COPY outreach_backend/requirements.txt .
 
+# Install dependencies
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
+# Copy your project files into /app/outreach_backend
 COPY outreach_backend/. .
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
+# Run gunicorn from inside the project folder, no need to prefix module name
 CMD ["gunicorn", "wsgi:application", "--bind", "0.0.0.0:8000"]
