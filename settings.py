@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 from decouple import config # type: ignore
 import os
+import dj_database_url 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -79,19 +80,12 @@ WSGI_APPLICATION = 'outreach_backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+ # Add this at the top of the file with other imports
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',  # ✅ FIXED
-        'NAME': config('DB_NAME', default='outreach_db'),
-        'USER': config('DB_USER', default='outreach_user'),
-        'PASSWORD': config('DB_PASSWORD', default='OutreachPass456!'),
-        'HOST': config('DB_HOST', default='db'),
-        'PORT': config('DB_PORT', default='3306'),
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-        },
-    }
+    'default': dj_database_url.config(default=config('DATABASE_URL'))
 }
+
 
 
 # Password validation
