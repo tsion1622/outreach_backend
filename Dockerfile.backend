@@ -1,20 +1,15 @@
 FROM python:3.10
 
-# Set work directory
-WORKDIR /app
+WORKDIR /app/outreach_backend
 
-# Install dependencies
-COPY outreach_backend/requirements.txt .
+COPY outreach_backend/requirements.txt ./
 
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-# Copy project
-COPY . .
+COPY outreach_backend/. .
 
-# Set environment variable
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# Run gunicorn
-CMD ["gunicorn", "outreach_backend.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn", "wsgi:application", "--bind", "0.0.0.0:8000"]
