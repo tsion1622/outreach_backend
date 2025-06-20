@@ -1,0 +1,7 @@
+Django>=5.2.3
+python-decouple>=3.8
+dj-database-url>=2.1.0
+mysqlclient>=2.2.4
+redis>=5.0.1
+gunicorn>=21.2.0
+celery>=5.3.6
