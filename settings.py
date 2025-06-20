@@ -57,7 +57,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'outreach_backend.urls'
+RROOT_URLCONF = 'urls'
+
 
 TEMPLATES = [
     {
@@ -74,7 +75,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'outreach_backend.wsgi.application'
+WSGI_APPLICATION = 'wsgi.application'
 
 
 # Database
