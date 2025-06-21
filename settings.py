@@ -84,7 +84,7 @@ WSGI_APPLICATION = 'wsgi.application'
  # Add this at the top of the file with other imports
 
 DATABASES = {
-    'default': dj_database_url.config(default=config('DATABASE_URL'))
+    'default': dj_database_url.config(conn_max_age=600)
 }
 
 
