@@ -9,6 +9,7 @@ import os
 import csv
 from datetime import datetime
 import sys
+from .scraper import WebScraper
 import pandas as pd
 
 # Remove hardcoded Docker path
