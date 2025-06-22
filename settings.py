@@ -36,7 +36,7 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     '0.0.0.0',
-    'outreach_backend-v8vl.onrender.com'  
+    'outreach-backend-v8vl.onrender.com' 
 ]
 
 
