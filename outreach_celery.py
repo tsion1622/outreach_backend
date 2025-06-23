@@ -1,12 +1,12 @@
 from __future__ import absolute_import, unicode_literals
 import os
-from outreach_celery import Celery
+from celery import Celery
 from decouple import config
 
 # Set default Django settings module for 'celery'
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings')  # or 'outreach_backend.settings' if it's in a subfolder
 
-app = Celery('outreach_backend')  # App name should match project name, NOT the file name
+app = Celery('outreach')  # App name should match project name, NOT the file name
 
 # Broker and backend config
 app.conf.broker_url = config('REDIS_URL', default='redis://redis:6379/0')
