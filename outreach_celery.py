@@ -1,6 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 import os
-from celery import Celery
+from outreach_celery import Celery
 from decouple import config
 
 # Set default Django settings module for 'celery'

@@ -10,3 +10,4 @@ djangorestframework>=3.15.1
 # Optional/Recommended
 django-cors-headers>=4.3.1
 whitenoise>=6.6.0
+pandas

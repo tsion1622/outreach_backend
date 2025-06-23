@@ -1,4 +1,4 @@
-from celery import shared_task
+from outreach_celery import shared_task
 from django.contrib.auth.models import User
 from .models import DomainDiscoveryTask, ScrapingTask, Contact, EmailSendingTask, EmailCampaign, EmailCampaignContact, SMTPConfiguration
 import logging
