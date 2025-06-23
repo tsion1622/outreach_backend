@@ -11,6 +11,7 @@ from django.db.models import Q, Count
 from django.http import HttpResponse
 from django.utils import timezone
 import logging
+from .tasks import domain_discovery_task
 import uuid
 import csv
 import io
