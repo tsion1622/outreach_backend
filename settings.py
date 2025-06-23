@@ -109,6 +109,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",          
     "http://127.0.0.1:3000",           
     "https://outreach-frontend-nine.vercel.app",  
+]
 
 CELERY_BROKER_URL = config('REDIS_URL', default='redis://redis:6379/0')
 CELERY_RESULT_BACKEND = config('REDIS_URL', default='redis://redis:6379/0')
