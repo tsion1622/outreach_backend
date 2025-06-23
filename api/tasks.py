@@ -1,4 +1,4 @@
-from outreach_celery import shared_task
+
 from django.contrib.auth.models import User
 from .models import DomainDiscoveryTask, ScrapingTask, Contact, EmailSendingTask, EmailCampaign, EmailCampaignContact, SMTPConfiguration
 import logging
@@ -9,6 +9,7 @@ import os
 import csv
 from datetime import datetime
 import sys
+from celery import shared_task
 from .scraper import WebScraper
 import pandas as pd
 
