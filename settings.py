@@ -2,6 +2,7 @@ from pathlib import Path
 from decouple import config  # type: ignore
 import os
 import dj_database_url
+import ssl  
 
 BASE_DIR = Path(__file__).resolve().parent
 STATIC_URL = '/static/'
@@ -96,7 +97,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://outreach-frontend-nine.vercel.app",
 ]
 
-# Celery configuration with Redis URL from .env
+# Celery configuration with Redis SSL options
 CELERY_BROKER_URL = config("REDIS_URL")
 CELERY_RESULT_BACKEND = config("REDIS_URL")
 
@@ -105,12 +106,13 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 
-# SSL settings for Redis over rediss://
+# SSL config for Redis (rediss://) connections
 CELERY_BROKER_USE_SSL = {
-    'ssl_cert_reqs': False,  # disables cert verification (CERT_NONE)
+    'ssl_cert_reqs': ssl.CERT_NONE,
 }
+
 CELERY_RESULT_BACKEND_USE_SSL = {
-    'ssl_cert_reqs': False,
+    'ssl_cert_reqs': ssl.CERT_NONE,
 }
 
 # Logging config
