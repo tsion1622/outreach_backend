@@ -1,21 +1,20 @@
 from __future__ import absolute_import, unicode_literals
 import os
 from celery import Celery
-from decouple import config
 
 # Set default Django settings module for 'celery'
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings')  # or 'outreach_backend.settings' if it's in a subfolder
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings')  # adjust if needed
 
-app = Celery('outreach')  # App name should match project name, NOT the file name
+app = Celery('outreach')  # should match the Django project name
 
-# Broker and backend config
-app.conf.broker_url = config('REDIS_URL', default='redis://redis:6379/0')
-app.conf.result_backend = config('REDIS_URL', default='redis://redis:6379/0')
+# Use os.getenv for environment variables
+app.conf.broker_url = os.getenv('REDIS_URL', 'redis://redis:6379/0')
+app.conf.result_backend = os.getenv('REDIS_URL', 'redis://redis:6379/0')
 
-# Load config from Django settings, using CELERY_ prefix
+# Load configuration from Django settings with 'CELERY_' prefix
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
-# Discover tasks in all registered Django app configs
+# Auto-discover tasks
 app.autodiscover_tasks()
 
 @app.task(bind=True)
