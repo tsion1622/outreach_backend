@@ -1,14 +1,14 @@
 from pathlib import Path
-from decouple import config  # type: ignore
 import os
+import ssl
+from decouple import config  
 import dj_database_url
-import ssl  
 
 BASE_DIR = Path(__file__).resolve().parent
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-oz(e)fg3x#jxi4315k(_o)fi@6@t4049210sik&+)9&-ij^_lc')
+SECRET_KEY = config('SECRET_KEY', default='unsafe-secret-key')
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = [
@@ -32,7 +32,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # at the top
+    'corsheaders.middleware.CorsMiddleware',  # Must be on top
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -97,7 +97,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://outreach-frontend-nine.vercel.app",
 ]
 
-# Celery configuration with Redis SSL options
+
 CELERY_BROKER_URL = config("REDIS_URL")
 CELERY_RESULT_BACKEND = config("REDIS_URL")
 
@@ -106,16 +106,15 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 
-# SSL config for Redis (rediss://) connections
+
 CELERY_BROKER_USE_SSL = {
     'ssl_cert_reqs': ssl.CERT_NONE,
 }
-
 CELERY_RESULT_BACKEND_USE_SSL = {
     'ssl_cert_reqs': ssl.CERT_NONE,
 }
 
-# Logging config
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
