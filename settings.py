@@ -96,7 +96,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://outreach-frontend-nine.vercel.app",
 ]
 
-# Celery configuration with Redis SSL options
+# Celery configuration with Redis URL from .env
 CELERY_BROKER_URL = config("REDIS_URL")
 CELERY_RESULT_BACKEND = config("REDIS_URL")
 
@@ -105,9 +105,12 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 
-# Celery SSL config for Redis rediss://
-CELERY_REDIS_BACKEND_USE_SSL = {
-    'ssl_cert_reqs': False  # Disable cert requirement (CERT_NONE)
+# SSL settings for Redis over rediss://
+CELERY_BROKER_USE_SSL = {
+    'ssl_cert_reqs': False,  # disables cert verification (CERT_NONE)
+}
+CELERY_RESULT_BACKEND_USE_SSL = {
+    'ssl_cert_reqs': False,
 }
 
 # Logging config
