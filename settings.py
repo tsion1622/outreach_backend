@@ -17,7 +17,7 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     '0.0.0.0',
-    'outreach-backend-v8vl.onrender.com'  # ← Make sure this matches Render URL
+    'outreach-backend-v8vl.onrender.com',
 ]
 
 # Installed apps
@@ -36,7 +36,7 @@ INSTALLED_APPS = [
 
 # Middleware
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # ← Should be at the top
+    'corsheaders.middleware.CorsMiddleware',  # Should be at the top
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -81,16 +81,14 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
+# Django REST Framework settings
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
@@ -102,7 +100,6 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 100,
 }
 
-
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
@@ -111,15 +108,16 @@ CORS_ALLOWED_ORIGINS = [
     "https://outreach-frontend-nine.vercel.app",  
 ]
 
+# Celery configuration using REDIS_URL from .env
 CELERY_BROKER_URL = config('REDIS_URL')
 CELERY_RESULT_BACKEND = config('REDIS_URL')
+
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 
-
-
+# Logging
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
