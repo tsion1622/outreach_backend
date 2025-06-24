@@ -2,19 +2,23 @@ from __future__ import absolute_import, unicode_literals
 import os
 from celery import Celery
 
-# Set default Django settings module for 'celery'
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings')  # adjust if needed
 
-app = Celery('outreach')  # should match the Django project name
+app = Celery('outreach')
 
-# Use os.getenv for environment variables
-app.conf.broker_url = os.getenv('REDIS_URL', 'redis://redis:6379/0')
-app.conf.result_backend = os.getenv('REDIS_URL', 'redis://redis:6379/0')
-
-# Load configuration from Django settings with 'CELERY_' prefix
+# Load config from Django settings with 'CELERY_' namespace
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
-# Auto-discover tasks
+# Use environment variable REDIS_URL for broker and backend
+redis_url = os.getenv('REDIS_URL', 'redis://redis:6379/0')
+app.conf.broker_url = redis_url
+app.conf.result_backend = redis_url
+
+# SSL options for Redis (important if REDIS_URL uses rediss://)
+app.conf.broker_use_ssl = {
+    'ssl_cert_reqs': False,  # or use ssl.CERT_NONE if you import ssl
+}
+
 app.autodiscover_tasks()
 
 @app.task(bind=True)

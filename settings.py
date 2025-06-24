@@ -1,18 +1,15 @@
 from pathlib import Path
 from decouple import config  # type: ignore
 import os
-import dj_database_url 
+import dj_database_url
 
-# Base directory
 BASE_DIR = Path(__file__).resolve().parent
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Secret key & debug
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-oz(e)fg3x#jxi4315k(_o)fi@6@t4049210sik&+)9&-ij^_lc')
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-# Allowed hosts
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
@@ -20,7 +17,6 @@ ALLOWED_HOSTS = [
     'outreach-backend-v8vl.onrender.com',
 ]
 
-# Installed apps
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -34,9 +30,8 @@ INSTALLED_APPS = [
     'api',
 ]
 
-# Middleware
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # Should be at the top
+    'corsheaders.middleware.CorsMiddleware',  # at the top
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -48,7 +43,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'urls'
 
-# Templates
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -66,14 +60,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'wsgi.application'
 
-# Database
 DATABASES = {
-    'default': dj_database_url.config(
-        default=config('DATABASE_URL')
-    )
+    'default': dj_database_url.config(default=config('DATABASE_URL'))
 }
 
-# Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -88,7 +78,6 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Django REST Framework settings
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
@@ -101,14 +90,13 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOW_CREDENTIALS = True
-
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",          
-    "http://127.0.0.1:3000",           
-    "https://outreach-frontend-nine.vercel.app",  
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://outreach-frontend-nine.vercel.app",
 ]
 
-# Celery configuration using REDIS_URL from .env
+# Celery configuration with Redis SSL options
 CELERY_BROKER_URL = config("REDIS_URL")
 CELERY_RESULT_BACKEND = config("REDIS_URL")
 
@@ -117,7 +105,12 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 
-# Logging
+# Celery SSL config for Redis rediss://
+CELERY_REDIS_BACKEND_USE_SSL = {
+    'ssl_cert_reqs': False  # Disable cert requirement (CERT_NONE)
+}
+
+# Logging config
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -161,6 +154,5 @@ LOGGING = {
         },
     },
 }
-
 
 os.makedirs(os.path.join(BASE_DIR, 'logs'), exist_ok=True)
