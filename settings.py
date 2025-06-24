@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-SECRET_KEY = config('SECRET_KEY', default='your-unsafe-secret-key')
+SECRET_KEY = config('SECRET_KEY', default='unsafe-secret-key')
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = [
@@ -98,15 +98,17 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 # ✅ Celery Configuration
-CELERY_BROKER_URL = config("REDIS_URL")
-CELERY_RESULT_BACKEND = config("REDIS_URL")
+REDIS_URL = config("REDIS_URL")
+
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 
-# ✅ Add SSL config for rediss://
-if CELERY_BROKER_URL.startswith("rediss://"):
+# ✅ Celery SSL Fix
+if REDIS_URL.startswith("rediss://"):
     CELERY_BROKER_USE_SSL = {"ssl_cert_reqs": ssl.CERT_NONE}
     CELERY_REDIS_BACKEND_SSL = {"ssl_cert_reqs": ssl.CERT_NONE}
 
@@ -155,4 +157,5 @@ LOGGING = {
     },
 }
 
+# Make sure logs folder exists
 os.makedirs(os.path.join(BASE_DIR, 'logs'), exist_ok=True)
