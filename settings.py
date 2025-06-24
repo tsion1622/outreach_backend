@@ -111,12 +111,13 @@ CORS_ALLOWED_ORIGINS = [
     "https://outreach-frontend-nine.vercel.app",  
 ]
 
-CELERY_BROKER_URL = config('REDIS_URL', default='redis://redis:6379/0')
-CELERY_RESULT_BACKEND = config('REDIS_URL', default='redis://redis:6379/0')
+CELERY_BROKER_URL = config('REDIS_URL')
+CELERY_RESULT_BACKEND = config('REDIS_URL')
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
+
 
 
 LOGGING = {
