@@ -98,9 +98,8 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 # ✅ Celery Configuration
-CELERY_BROKER_URL = config('REDIS_URL')
-CELERY_RESULT_BACKEND = config('REDIS_URL')
-
+CELERY_BROKER_URL = config("REDIS_URL")
+CELERY_RESULT_BACKEND = config("REDIS_URL")
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -108,8 +107,8 @@ CELERY_TIMEZONE = TIME_ZONE
 
 # ✅ Add SSL config for rediss://
 if CELERY_BROKER_URL.startswith("rediss://"):
-    CELERY_BROKER_USE_SSL = {'ssl_cert_reqs': ssl.CERT_NONE}
-    CELERY_REDIS_BACKEND_USE_SSL = {'ssl_cert_reqs': ssl.CERT_NONE}
+    CELERY_BROKER_USE_SSL = {"ssl_cert_reqs": ssl.CERT_NONE}
+    CELERY_REDIS_BACKEND_SSL = {"ssl_cert_reqs": ssl.CERT_NONE}
 
 # ✅ Logging
 LOGGING = {
