@@ -97,7 +97,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://outreach-frontend-nine.vercel.app",
 ]
 
-# ✅ Celery & Redis Configuration
+# ✅ Celery & Redis
 REDIS_URL = config("REDIS_URL")
 
 CELERY_BROKER_URL = REDIS_URL
@@ -107,7 +107,7 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 
-# ✅ Fix for rediss:// SSL Redis via Upstash
+# ✅ Upstash rediss:// support
 if REDIS_URL.startswith("rediss://"):
     ssl_opts = {'ssl_cert_reqs': ssl.CERT_NONE}
     CELERY_BROKER_USE_SSL = ssl_opts
@@ -158,5 +158,5 @@ LOGGING = {
     },
 }
 
-# Ensure logs folder exists
+# Ensure log folder exists
 os.makedirs(os.path.join(BASE_DIR, 'logs'), exist_ok=True)
