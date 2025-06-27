@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 
 @shared_task(bind=True)
 def domain_discovery_task(self, task_id, industry_or_seed_domain):
+    task = None
     try:
         task = DomainDiscoveryTask.objects.get(id=task_id)
         task.status = 'running'
@@ -59,9 +60,10 @@ def domain_discovery_task(self, task_id, industry_or_seed_domain):
 
     except Exception as e:
         logger.error(f"Domain discovery task failed: {str(e)}")
-        task.status = 'failed'
-        task.error_message = str(e)
-        task.save()
+        if task:
+            task.status = 'failed'
+            task.error_message = str(e)
+            task.save()
         raise
 
 
