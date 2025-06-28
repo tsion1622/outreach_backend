@@ -11,10 +11,13 @@ from django.db.models import Q, Count
 from django.http import HttpResponse
 from django.utils import timezone
 import logging
-from .tasks import domain_discovery_task
+
 import uuid
 import csv
 import io
+
+
+from .tasks import domain_discovery_task, bulk_scraping_task, email_sending_task
 
 from .models import (
     DomainDiscoveryTask, ScrapingTask, Contact, EmailCampaign, 
@@ -26,7 +29,6 @@ from .serializers import (
     EmailSendingTaskSerializer, EmailTrackingEventSerializer, SMTPConfigurationSerializer,
     CampaignCreateSerializer, BulkContactDeleteSerializer
 )
-#from .tasks import domain_discovery_task, bulk_scraping_task, email_sending_task
 
 logger = logging.getLogger(__name__)
 
@@ -438,4 +440,3 @@ def email_click_tracking(request, campaign_id, contact_id):
         return HttpResponse(f'<script>window.location.href="{original_url}";</script>')
     else:
         return HttpResponse('Invalid link')
-
