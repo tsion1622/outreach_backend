@@ -21,9 +21,10 @@ def domain_discovery_task(self, task_id, industry_or_seed_domain):
     task = None
     try:
         task = DomainDiscoveryTask.objects.get(id=task_id)
+
+        # Update status to running and save (use updated_at which is auto_now=True)
         task.status = 'running'
-        task.started_at = timezone.now()
-        task.save()
+        task.save(update_fields=['status', 'updated_at'])
 
         logger.info(f"Starting domain discovery for: {industry_or_seed_domain}")
 
@@ -45,9 +46,10 @@ def domain_discovery_task(self, task_id, industry_or_seed_domain):
 
         task.discovered_urls_count = len(discovered_urls)
         task.output_file_path = output_file
+
+        # Mark task as completed
         task.status = 'completed'
-        task.completed_at = timezone.now()
-        task.save()
+        task.save(update_fields=['discovered_urls_count', 'output_file_path', 'status', 'updated_at'])
 
         return {
             'status': 'completed',
@@ -60,8 +62,7 @@ def domain_discovery_task(self, task_id, industry_or_seed_domain):
         if task:
             task.status = 'failed'
             task.error_message = str(e)
-            task.completed_at = timezone.now()
-            task.save()
+            task.save(update_fields=['status', 'error_message', 'updated_at'])
         raise
 
 
@@ -71,8 +72,7 @@ def bulk_scraping_task(self, task_id, urls_file_path=None, urls_list=None):
     try:
         task = ScrapingTask.objects.get(id=task_id)
         task.status = 'running'
-        task.started_at = timezone.now()
-        task.save()
+        task.save(update_fields=['status', 'updated_at'])
 
         # Get list of URLs
         if urls_file_path and os.path.exists(urls_file_path):
@@ -84,7 +84,7 @@ def bulk_scraping_task(self, task_id, urls_file_path=None, urls_list=None):
             raise ValueError("No URLs provided for scraping.")
 
         task.total_urls = len(urls_to_scrape)
-        task.save()
+        task.save(update_fields=['total_urls', 'updated_at'])
 
         scraper = WebScraper(rate_limit=0.5, max_workers=10)
         scraped_results = scraper.run(urls_to_scrape)
@@ -112,14 +112,15 @@ def bulk_scraping_task(self, task_id, urls_file_path=None, urls_list=None):
         task.failed_urls = task.processed_urls - contacts_created
         task.status = 'completed'
 
-        # Save CSV
         temp_dir = tempfile.gettempdir()
         output_csv = os.path.join(temp_dir, f'scraped_data_{task_id}.csv')
         pd.DataFrame(scraped_results).to_csv(output_csv, index=False)
 
         task.output_csv_path = output_csv
-        task.completed_at = timezone.now()
-        task.save()
+        task.save(update_fields=[
+            'processed_urls', 'successful_urls', 'failed_urls',
+            'status', 'output_csv_path', 'updated_at'
+        ])
 
         return {
             'status': 'completed',
@@ -133,17 +134,12 @@ def bulk_scraping_task(self, task_id, urls_file_path=None, urls_list=None):
         if task:
             task.status = 'failed'
             task.error_message = str(e)
-            task.completed_at = timezone.now()
-            task.save()
+            task.save(update_fields=['status', 'error_message', 'updated_at'])
         raise
 
 
 @shared_task(bind=True)
 def email_sending_task(self, campaign_id):
-    """
-    Dummy email sending task (to prevent import errors).
-    You can implement logic to send emails using SMTPConfiguration & campaign details.
-    """
     try:
         campaign = EmailCampaign.objects.get(id=campaign_id)
         logger.info(f"Sending campaign {campaign.subject} to contacts...")
@@ -153,8 +149,7 @@ def email_sending_task(self, campaign_id):
         time.sleep(5)
 
         campaign.status = 'sent'
-        campaign.completed_at = timezone.now()
-        campaign.save()
+        campaign.save(update_fields=['status', 'updated_at'])
         return {'status': 'sent', 'campaign_id': campaign_id}
 
     except Exception as e:
