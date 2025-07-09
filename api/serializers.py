@@ -26,12 +26,24 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
 
 class DomainDiscoveryTaskSerializer(serializers.ModelSerializer):
+    discovered_urls = serializers.SerializerMethodField()
+
     class Meta:
         model = DomainDiscoveryTask
         fields = '__all__'
-        read_only_fields = ('id', 'user', 'status', 'discovered_urls_count', 'output_file_path', 'created_at', 'updated_at', 'error_message')
+        read_only_fields = (
+            'id', 'user', 'status', 'discovered_urls_count',
+            'output_file_path', 'created_at', 'updated_at', 'error_message'
+        )
 
-
+    def get_discovered_urls(self, obj):
+        if obj.output_file_path and os.path.exists(obj.output_file_path):
+            try:
+                with open(obj.output_file_path, 'r') as f:
+                    return f.read().splitlines()
+            except Exception:
+                return []
+        return []
 class ScrapingTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = ScrapingTask
