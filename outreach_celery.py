@@ -4,13 +4,13 @@ import django
 from celery import Celery
 
 # 1. Set default Django settings
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'outreach_backend.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings')
 
 # 2. Setup Django (MUST be done before importing models/tasks)
 django.setup()
 
 # 3. Create Celery app
-app = Celery('outreach_backend')
+app = Celery('outreach_celery')
 
 # 4. Load Celery config from Django settings
 app.config_from_object('django.conf:settings', namespace='CELERY')
