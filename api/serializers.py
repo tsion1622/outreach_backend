@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
+import os
 from .models import (
     DomainDiscoveryTask, ScrapingTask, Contact, EmailCampaign, 
     EmailCampaignContact, EmailSendingTask, EmailTrackingEvent, SMTPConfiguration
