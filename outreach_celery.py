@@ -1,22 +1,21 @@
+from __future__ import absolute_import
 import os
-import ssl
+import django
 from celery import Celery
 
+# 1. Set default Django settings
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'outreach_backend.settings')
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
+# 2. Setup Django (MUST be done before importing models/tasks)
+django.setup()
 
+# 3. Create Celery app
+app = Celery('outreach_backend')
 
-app = Celery("outreach")
+# 4. Load Celery config from Django settings
+app.config_from_object('django.conf:settings', namespace='CELERY')
 
-
-app.config_from_object("django.conf:settings", namespace="CELERY")
-
-
-broker_url = os.getenv("CELERY_BROKER_URL")
-if broker_url and broker_url.startswith("rediss://"):
-    ssl_opts = {"ssl_cert_reqs": ssl.CERT_NONE}
-    app.conf.broker_use_ssl = ssl_opts
-    app.conf.redis_backend_use_ssl = ssl_opts
-
-
+# 5. Auto-discover tasks from installed apps
 app.autodiscover_tasks()
+
+# DO NOT manually import tasks like `import api.tasks` – not needed

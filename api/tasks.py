@@ -2,6 +2,7 @@ import logging
 import os
 import tempfile
 from datetime import datetime
+import time
 
 import pandas as pd
 from celery import shared_task
@@ -16,17 +17,16 @@ from .scraper import WebScraper
 logger = logging.getLogger(__name__)
 
 
-@shared_task(bind=True)
+@shared_task(bind=True, name="api.tasks.domain_discovery_task")
 def domain_discovery_task(self, task_id, industry_or_seed_domain):
     task = None
     try:
         task = DomainDiscoveryTask.objects.get(id=task_id)
 
-        # Update status to running and save (use updated_at which is auto_now=True)
         task.status = 'running'
         task.save(update_fields=['status', 'updated_at'])
 
-        logger.info(f"Starting domain discovery for: {industry_or_seed_domain}")
+        logger.info(f"[{self.request.id}] Starting domain discovery for: {industry_or_seed_domain}")
 
         if industry_or_seed_domain.startswith('http'):
             base_domain = industry_or_seed_domain.rstrip('/')
@@ -46,8 +46,6 @@ def domain_discovery_task(self, task_id, industry_or_seed_domain):
 
         task.discovered_urls_count = len(discovered_urls)
         task.output_file_path = output_file
-
-        # Mark task as completed
         task.status = 'completed'
         task.save(update_fields=['discovered_urls_count', 'output_file_path', 'status', 'updated_at'])
 
@@ -66,7 +64,7 @@ def domain_discovery_task(self, task_id, industry_or_seed_domain):
         raise
 
 
-@shared_task(bind=True)
+@shared_task(bind=True, name="api.tasks.bulk_scraping_task")
 def bulk_scraping_task(self, task_id, urls_file_path=None, urls_list=None):
     task = None
     try:
@@ -138,15 +136,13 @@ def bulk_scraping_task(self, task_id, urls_file_path=None, urls_list=None):
         raise
 
 
-@shared_task(bind=True)
+@shared_task(bind=True, name="api.tasks.email_sending_task")
 def email_sending_task(self, campaign_id):
     try:
         campaign = EmailCampaign.objects.get(id=campaign_id)
-        logger.info(f"Sending campaign {campaign.subject} to contacts...")
+        logger.info(f"[{self.request.id}] Sending campaign {campaign.subject} to contacts...")
 
-        # Dummy delay to simulate sending
-        import time
-        time.sleep(5)
+        time.sleep(5)  # simulate delay
 
         campaign.status = 'sent'
         campaign.save(update_fields=['status', 'updated_at'])

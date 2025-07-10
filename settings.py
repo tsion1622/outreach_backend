@@ -28,7 +28,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    'api',
+    'outreach_backend.api.apps.ApiConfig',
 ]
 
 MIDDLEWARE = [
@@ -42,7 +42,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'urls'
+ROOT_URLCONF = 'outreach_backend.urls'
 
 TEMPLATES = [
     {
@@ -108,6 +108,14 @@ CELERY_TIMEZONE = TIME_ZONE
 if CELERY_BROKER_URL.startswith("rediss://"):
     CELERY_BROKER_USE_SSL = {"ssl_cert_reqs": ssl.CERT_NONE}
     CELERY_REDIS_BACKEND_USE_SSL = {"ssl_cert_reqs": ssl.CERT_NONE}
+
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    'visibility_timeout': 3600,       # How long task remains "reserved"
+    'socket_timeout': 30,             # Wait time before timeout error
+    'socket_connect_timeout': 30,     # Initial connection timeout
+    'retry_on_timeout': True
+}
+
 
 LOGGING = {
     'version': 1,
