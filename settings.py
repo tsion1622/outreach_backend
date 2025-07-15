@@ -61,9 +61,21 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'wsgi.application'
 
+# ✅ SAFE DATABASE CONFIG FOR MYSQL (RAILWAY)
+db_config = dj_database_url.parse(config('DATABASE_URL'))
+
+# Remove any invalid options like 'sslmode'
+if 'OPTIONS' in db_config:
+    db_config['OPTIONS'].pop('sslmode', None)
+
 DATABASES = {
-    'default': dj_database_url.config(default=config('DATABASE_URL'))
+    'default': dj_database_url.config(
+        default=config('DATABASE_URL'),
+        conn_max_age=600,
+        ssl_require=True
+    )
 }
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -104,18 +116,16 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 
-
 if CELERY_BROKER_URL.startswith("rediss://"):
     CELERY_BROKER_USE_SSL = {"ssl_cert_reqs": ssl.CERT_NONE}
     CELERY_REDIS_BACKEND_USE_SSL = {"ssl_cert_reqs": ssl.CERT_NONE}
 
 CELERY_BROKER_TRANSPORT_OPTIONS = {
-    'visibility_timeout': 3600,       # How long task remains "reserved"
-    'socket_timeout': 30,             # Wait time before timeout error
-    'socket_connect_timeout': 30,     # Initial connection timeout
+    'visibility_timeout': 3600,
+    'socket_timeout': 30,
+    'socket_connect_timeout': 30,
     'retry_on_timeout': True
 }
-
 
 LOGGING = {
     'version': 1,
