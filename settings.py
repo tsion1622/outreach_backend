@@ -1,36 +1,38 @@
 from pathlib import Path
 import os
 import ssl
-from decouple import config
-import dj_database_url
+from corsheaders.defaults import default_headers
+
+from decouple import config, Csv
 
 BASE_DIR = Path(__file__).resolve().parent
+
+# Static files
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+# Secret & debug from .env
 SECRET_KEY = config('SECRET_KEY', default='unsafe-secret-key')
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '0.0.0.0',
-    'outreach-backend-v8vl.onrender.com',
-]
+# Allowed hosts from .env, parsed as CSV
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
 
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'api',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    'api',
+    
 ]
 
+# Middleware
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -42,8 +44,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'urls'
+ROOT_URLCONF = 'outreach_backend.urls'
 
+# Templates
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -59,24 +62,28 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'wsgi.application'
+WSGI_APPLICATION = 'outreach_backend.wsgi.application'
 
-# ✅ SAFE DATABASE CONFIG FOR MYSQL (RAILWAY)
-db_config = dj_database_url.parse(config('DATABASE_URL'))
 
-# Remove any invalid options like 'sslmode'
-if 'OPTIONS' in db_config:
-    db_config['OPTIONS'].pop('sslmode', None)
+
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default=config('DATABASE_URL'),
-        conn_max_age=600,
-        ssl_require=True
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': config('DB_NAME'),       
+        'USER': config('DB_USER'),       
+        'PASSWORD': config('DB_PASSWORD'),  
+        'HOST': config('DB_HOST'),       
+        'PORT': config('DB_PORT', cast=int), 
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
+    }
 }
 
 
+
+# Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -84,6 +91,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
+# Localization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
@@ -91,6 +99,7 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# DRF settings
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
@@ -102,23 +111,28 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 100,
 }
 
+# CORS config for local React frontend
 CORS_ALLOW_CREDENTIALS = True
+
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "https://outreach-frontend-nine.vercel.app",
+    "https://outreach-frontend-nine.vercel.app",  
+    "https://9a93a5003588.ngrok-free.app",        
 ]
 
-CELERY_BROKER_URL = config("CELERY_BROKER_URL")
-CELERY_RESULT_BACKEND = CELERY_BROKER_URL
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = TIME_ZONE
 
-if CELERY_BROKER_URL.startswith("rediss://"):
-    CELERY_BROKER_USE_SSL = {"ssl_cert_reqs": ssl.CERT_NONE}
-    CELERY_REDIS_BACKEND_USE_SSL = {"ssl_cert_reqs": ssl.CERT_NONE}
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'ngrok-skip-browser-warning',
+]
+
+# Celery + Redis config
+#CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="redis://localhost:6379/0")
+#CELERY_RESULT_BACKEND = config("CELERY_RESULT_BACKEND", default=CELERY_BROKER_URL)
+
+
+CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = config("CELERY_RESULT_BACKEND", default=CELERY_BROKER_URL)
+
+
 
 CELERY_BROKER_TRANSPORT_OPTIONS = {
     'visibility_timeout': 3600,
@@ -127,6 +141,27 @@ CELERY_BROKER_TRANSPORT_OPTIONS = {
     'retry_on_timeout': True
 }
 
+
+if CELERY_BROKER_URL.startswith("rediss://"):
+    CELERY_BROKER_USE_SSL = {"ssl_cert_reqs": ssl.CERT_NONE}
+    CELERY_REDIS_BACKEND_USE_SSL = {"ssl_cert_reqs": ssl.CERT_NONE}
+    
+    
+    CELERY_BROKER_TRANSPORT_OPTIONS.update(CELERY_BROKER_USE_SSL)
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_HOST = config('SMTP_SERVER', default='smtp.example.com')
+EMAIL_PORT = config('SMTP_PORT', cast=int, default=587)
+EMAIL_HOST_USER = config('SMTP_USERNAME', default='')
+EMAIL_HOST_PASSWORD = config('SMTP_PASSWORD', default='')
+EMAIL_USE_TLS = True
+
+
+DEFAULT_FROM_EMAIL = config('SMTP_FROM_NAME', default='Outreach Admin <no-reply@example.com>')
+
+# Logging
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
